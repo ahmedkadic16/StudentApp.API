@@ -15,9 +15,7 @@ namespace StudentApp.API.Repositories
         {
             this.context = context;
         }
-
-        
-
+              
         public async Task<List<Student>> GetStudents()
         {
            return await context.Student.Include(nameof(Gender)).Include(nameof(Address)).ToListAsync();
@@ -54,7 +52,19 @@ namespace StudentApp.API.Repositories
                 await context.SaveChangesAsync();
                 return existingStudent;
             }
+            
+            return null;
+        }
 
+        public async Task<Student> DeleteStudent(Guid studentId)
+        {
+            var student = await GetStudent(studentId);
+            if(student != null)
+            {
+               context.Student.Remove(student);
+               await context.SaveChangesAsync();
+               return student;
+            }
             return null;
         }
     }

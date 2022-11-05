@@ -13,5 +13,6 @@ namespace StudentApp.API.Repositories
         Task<List<Gender>> GetGenders();
         Task<bool> Exists(Guid studentId);
         Task<Student> UpdateStudent(Guid studentId, Student request);
+        Task<Student> DeleteStudent(Guid studentId);
     }
 }
