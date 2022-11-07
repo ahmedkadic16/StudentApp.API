@@ -43,7 +43,7 @@ namespace StudentApp.API.Controllers
             return Ok(mapper.Map<Student>(student));
         }
         [HttpPut]
-        [Route("[controller]/{studentId:guid}")]
+        [Route("[controller]/{studentId:guid}"),ActionName("GetStudent")]
         public async Task<IActionResult> UpdateStudent([FromRoute] Guid studentId,[FromBody] UpdateStudentRequest request)
         {
             if( await studentRepository.Exists(studentId))
@@ -67,6 +67,14 @@ namespace StudentApp.API.Controllers
                 return Ok(mapper.Map<Student>(student));
             }
             return NotFound();
+        }
+
+        [HttpPost]
+        [Route("[controller]/Add")]
+        public async Task<IActionResult> AddStudent([FromBody] AddStudentRequest request)
+        {
+           var student=await studentRepository.AddStudent(mapper.Map<Api.DataModels.Student>(request));
+            return CreatedAtAction(nameof(GetStudent), new { studentId = student.Id }, mapper.Map<Student>(student));
         }
     }
 }
