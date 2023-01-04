@@ -14,6 +14,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Extensions.FileProviders;
+using System.IO;
 
 namespace StudentApp.API
 {
@@ -43,7 +45,9 @@ namespace StudentApp.API
             services.AddDbContext<StudentAdminContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("StudentDb")));
             services.AddScoped<IStudentRepository, SqlStudentRepository>();
-            
+            services.AddScoped<IImageRepository, LocalStorageImageRepository>();
+
+
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "StudentApp.API", Version = "v1" });
@@ -62,6 +66,12 @@ namespace StudentApp.API
             }
 
             app.UseHttpsRedirection();
+
+            app.UseStaticFiles(new StaticFileOptions
+            {
+                FileProvider = new PhysicalFileProvider(Path.Combine(env.ContentRootPath,"Resources")),
+                RequestPath="/Resources"
+            });
 
             app.UseRouting();
 

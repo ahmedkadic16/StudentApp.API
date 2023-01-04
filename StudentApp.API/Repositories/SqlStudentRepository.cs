@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace StudentApp.API.Repositories
 {
+
     public class SqlStudentRepository : IStudentRepository
     {
         private readonly StudentAdminContext context;
@@ -73,6 +74,21 @@ namespace StudentApp.API.Repositories
           var student = await context.Student.AddAsync(request);
            await context.SaveChangesAsync();
             return student.Entity;
+        }
+
+        public async Task<bool> UpdateProfileImage(Guid studentId, string profileImageUrl)
+        {
+            var student = await GetStudent  (studentId);
+
+            if(student != null)
+            {
+                student.ProfileImageUrl = profileImageUrl;
+                await context.SaveChangesAsync();
+                return true;
+            }
+            return false;
+
+
         }
     }
     
