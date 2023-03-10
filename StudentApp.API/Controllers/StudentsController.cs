@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace StudentApp.API.Controllers
 {
-    [ApiController] //annottating controlelr
+    [ApiController] //annottating controler
     public class StudentsController : Controller
     {
         private readonly IStudentRepository studentRepository;
@@ -81,31 +81,38 @@ namespace StudentApp.API.Controllers
            var student=await studentRepository.AddStudent(mapper.Map<Api.DataModels.Student>(request));
             return CreatedAtAction(nameof(GetStudent), new { studentId = student.Id }, mapper.Map<Student>(student));
         }
+
         [HttpPost]
         [Route("[controller]/{studentId:guid}/upload-image")]
         public async Task<IActionResult> UploadImage([FromRoute] Guid studentId,IFormFile profileImage)
         {
-            if(await studentRepository.Exists(studentId))
+            var validExtensions = new List<string>
             {
-                var fileName = Guid.NewGuid() + Path.GetExtension(profileImage.FileName);
-                var fileImagePath = await imageRepository.Upload(profileImage, fileName);
-
-                if(await studentRepository.UpdateProfileImage(studentId, fileImagePath))
+                ".jpeg",
+                ".png",
+                ".gif",
+                ".jpg"
+            };
+            if(profileImage!= null && profileImage.Length > 0)
+            {
+                var exension = Path.GetExtension(profileImage.FileName);
+                if(validExtensions.Contains(exension))
                 {
-                    return Ok(fileImagePath);
+                    if (await studentRepository.Exists(studentId))
+                    {
+                        var fileName = Guid.NewGuid() + Path.GetExtension(profileImage.FileName);
+                        var fileImagePath = await imageRepository.Upload(profileImage, fileName);
+
+                        if (await studentRepository.UpdateProfileImage(studentId, fileImagePath))
+                        {
+                            return Ok(fileImagePath);
+                        }
+                        return StatusCode(StatusCodes.Status500InternalServerError, "Error uploading image");
+                    }
                 }
-                return StatusCode(StatusCodes.Status500InternalServerError, "Error uploading image");
-
-
+                return BadRequest("Bad image format");
             }
-            return NotFound();
-
+              return NotFound();
         }
-
-
-
-
     }
-
-
 }

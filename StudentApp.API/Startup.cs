@@ -16,6 +16,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.FileProviders;
 using System.IO;
+using FluentValidation.AspNetCore;
 
 namespace StudentApp.API
 {
@@ -42,6 +43,10 @@ namespace StudentApp.API
                  });
             });
             services.AddControllers();
+
+            services.AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining<Startup>());
+
+
             services.AddDbContext<StudentAdminContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("StudentDb")));
             services.AddScoped<IStudentRepository, SqlStudentRepository>();
